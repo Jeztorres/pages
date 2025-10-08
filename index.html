@@ -3,277 +3,474 @@
 <head>
     <meta charset="UTF-8">
     <title>Zona de Combate - FPS Game</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            background: linear-gradient(45deg, #1a1a2e, #16213e, #0f0f23);
+            font-family: "Rajdhani", sans-serif;
             color: white;
+            background: #000;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
-        .menu-container {
+        /* Crosshair */
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2%;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.8));
+        }
+
+        /* Ammo Counter */
+        #ammo_container {
+            position: absolute;
+            right: 5%;
+            bottom: 5%;
+            font-size: 3em;
+            font-family: "Orbitron", monospace;
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Loading Progress */
+        #progress {
+            position: absolute;
+            bottom: 9%;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #00ff41, #00d4aa, #0099ff);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.8);
+            border-radius: 2px;
+        }
+
+        /* Health Bar */
+        #health_container {
+            position: absolute;
+            bottom: 8%;
+            left: 5%;
+            width: 20%;
+            height: 25px;
+            border: 3px solid #ffffff;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        #health_progress {
+            position: absolute;
+            background: linear-gradient(90deg, #ff4757, #ff3838);
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+            transition: all 0.3s ease;
+        }
+
+        /* Game HUD */
+        #game_hud {
+            visibility: hidden;
+        }
+
+        /* EPIC MENU STYLES */
+        #menu {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(
+                ellipse at center,
+                #1a1a2e 0%,
+                #16213e 50%,
+                #0f0f23 100%
+            );
             text-align: center;
-            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            visibility: visible;
+            overflow: hidden;
         }
 
+        /* Animated Background */
+        #menu::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(
+                    circle at 25% 25%,
+                    rgba(255, 0, 150, 0.1) 0%,
+                    transparent 50%
+                ),
+                radial-gradient(
+                    circle at 75% 75%,
+                    rgba(0, 255, 255, 0.1) 0%,
+                    transparent 50%
+                ),
+                radial-gradient(
+                    circle at 50% 50%,
+                    rgba(255, 255, 0, 0.05) 0%,
+                    transparent 70%
+                );
+            animation: rotateBackground 20s linear infinite;
+        }
+
+        @keyframes rotateBackground {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .menu-content {
+            position: relative;
+            z-index: 10;
+            transform: perspective(1000px) rotateX(5deg);
+        }
+
+        /* Epic Title */
         h1 {
-            font-size: 4em;
-            margin-bottom: 0.5em;
-            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0);
+            font-family: "Orbitron", monospace;
+            font-size: 6em;
+            font-weight: 900;
+            margin-bottom: 0.3em;
+            background: linear-gradient(45deg, #ff0080, #ff8c00, #40e0d0, #ff0080);
+            background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            animation: epicGradient 4s ease-in-out infinite;
             text-shadow: 0 0 30px rgba(255, 0, 128, 0.5);
+            letter-spacing: 3px;
+            position: relative;
         }
 
+        @keyframes epicGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Epic Subtitle */
         .subtitle {
-            font-size: 1.5em;
+            font-size: 1.8em;
+            font-weight: 300;
             color: #00ffff;
-            margin-bottom: 2em;
+            margin-bottom: 3em;
             text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            letter-spacing: 2px;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
+        @keyframes glow {
+            0% { text-shadow: 0 0 20px rgba(0, 255, 255, 0.5); }
+            100% { text-shadow: 0 0 30px rgba(0, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.3); }
+        }
+
+        /* Epic Buttons */
         .menu-button {
             background: linear-gradient(45deg, rgba(0, 0, 0, 0.8), rgba(30, 30, 30, 0.9));
-            color: white;
-            font-size: 1.2em;
-            font-weight: bold;
+            color: #ffffff;
+            font-size: 1.4em;
+            font-weight: 600;
+            font-family: "Rajdhani", sans-serif;
             border: 2px solid transparent;
             border-radius: 15px;
             cursor: pointer;
-            margin: 10px;
-            padding: 15px 30px;
-            transition: all 0.3s ease;
+            margin: 12px 0;
+            padding: 18px 40px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            min-width: 250px;
-            display: block;
-            margin: 15px auto;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            min-width: 320px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .menu-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255, 0, 128, 0.3);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 0, 128, 0.4);
             border-color: #ff0080;
-            background: linear-gradient(45deg, #ff0080, #ff8c00);
+            color: #ffffff;
         }
 
-        .game-container {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #000;
-            z-index: 2000;
+        .mode-description {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 5px;
+            font-weight: 300;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        .game-content {
+        .menu-button:hover .mode-description {
+            opacity: 1;
+        }
+
+        /* Loading message */
+        #loading_message {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            font-family: "Orbitron", monospace;
+            font-size: 2em;
+            color: #00ffff;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+            display: none;
+            z-index: 3000;
+        }
+
+        /* Error message */
+        #error_message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: "Orbitron", monospace;
+            font-size: 1.5em;
+            color: #ff0000;
+            text-shadow: 0 0 20px rgba(255, 0, 0, 0.8);
+            display: none;
+            z-index: 3000;
             text-align: center;
-        }
-
-        .game-title {
-            font-size: 3em;
-            color: #00ff00;
-            margin-bottom: 1em;
-            text-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
-        }
-
-        .game-info {
-            font-size: 1.2em;
-            color: #ffffff;
-            margin-bottom: 2em;
-            line-height: 1.6;
-        }
-
-        .back-button {
-            background: linear-gradient(45deg, rgba(255, 0, 0, 0.8), rgba(150, 0, 0, 0.9));
-            color: white;
-            font-size: 1em;
-            font-weight: bold;
-            border: 2px solid rgba(255, 0, 0, 0.6);
-            border-radius: 10px;
-            cursor: pointer;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-        }
-
-        .back-button:hover {
-            background: linear-gradient(45deg, rgba(255, 0, 0, 1), rgba(200, 0, 0, 1));
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-        }
-
-        .controls {
             background: rgba(0, 0, 0, 0.8);
             padding: 20px;
             border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .control-item {
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .key {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: bold;
-            color: #00ff41;
-        }
-
-        /* Animated background */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 25% 25%, rgba(255, 0, 150, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
-            animation: backgroundMove 20s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes backgroundMove {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            border: 2px solid rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
-    <div id="menu" class="menu-container">
-        <h1>ZONA DE COMBATE</h1>
-        <p class="subtitle">SOBREVIVE A LA INVASIÓN MUTANTE</p>
-        
-        <button class="menu-button" onclick="startGame('survival')">
-            MODO SUPERVIVENCIA
-        </button>
-        
-        <button class="menu-button" onclick="startGame('waves')">
-            MODO OLEADAS
-        </button>
-        
-        <button class="menu-button" onclick="startGame('classic')">
-            MODO CLÁSICO
-        </button>
-    </div>
-
-    <div id="game" class="game-container">
-        <div class="game-content">
-            <div class="game-title" id="gameTitle">MODO SUPERVIVENCIA</div>
-            
-            <div class="game-info">
-                <p><strong>¡Juego iniciado exitosamente!</strong></p>
-                <p>Este es una demostración del menú funcionando.</p>
-                <p>El juego completo requiere compilación con Webpack.</p>
-            </div>
-
-            <div class="controls">
-                <h3>CONTROLES:</h3>
-                <div class="control-item">
-                    <span>Mover:</span>
-                    <span class="key">WASD</span>
-                </div>
-                <div class="control-item">
-                    <span>Mirar:</span>
-                    <span class="key">Mouse</span>
-                </div>
-                <div class="control-item">
-                    <span>Disparar:</span>
-                    <span class="key">Click</span>
-                </div>
-                <div class="control-item">
-                    <span>Saltar:</span>
-                    <span class="key">Espacio</span>
-                </div>
-                <div class="control-item">
-                    <span>Zoom In:</span>
-                    <span class="key">T</span>
-                </div>
-                <div class="control-item">
-                    <span>Zoom Out:</span>
-                    <span class="key">G</span>
-                </div>
-                <div class="control-item">
-                    <span>Reset Zoom:</span>
-                    <span class="key">R</span>
-                </div>
-            </div>
-
-            <button class="back-button" onclick="backToMenu()">
-                VOLVER AL MENÚ
+    <div id="menu">
+        <div class="menu-content">
+            <h1>ZONA DE COMBATE</h1>
+            <p class="subtitle">SOBREVIVE A LA INVASIÓN MUTANTE</p>
+            <button class="menu-button" id="survival_mode">
+                MODO SUPERVIVENCIA
+                <div class="mode-description">Busca zonas seguras para regenerar vida</div>
+            </button>
+            <button class="menu-button" id="wave_mode">
+                MODO OLEADAS
+                <div class="mode-description">Enfrenta oleadas infinitas de enemigos</div>
+            </button>
+            <button class="menu-button" id="classic_mode">
+                MODO CLÁSICO
+                <div class="mode-description">Experiencia original del juego</div>
             </button>
         </div>
     </div>
 
-    <script>
-        function startGame(mode) {
-            console.log('Starting game mode:', mode);
-            
-            const menu = document.getElementById('menu');
-            const game = document.getElementById('game');
-            const gameTitle = document.getElementById('gameTitle');
-            
-            // Ocultar menú
-            menu.style.display = 'none';
-            
-            // Mostrar juego
-            game.style.display = 'block';
-            
-            // Actualizar título según el modo
-            switch(mode) {
-                case 'survival':
-                    gameTitle.textContent = 'MODO SUPERVIVENCIA';
-                    break;
-                case 'waves':
-                    gameTitle.textContent = 'MODO OLEADAS';
-                    break;
-                case 'classic':
-                    gameTitle.textContent = 'MODO CLÁSICO';
-                    break;
+    <div id="game_hud">
+        <div id="crosshair">+</div>
+        <div id="ammo_container">
+            <span id="current_ammo">30</span>
+            <span>|</span>
+            <span id="max_ammo">100</span>
+        </div>
+        <div id="health_container">
+            <div id="health_progress"></div>
+        </div>
+    </div>
+
+    <div id="loading_message">CARGANDO JUEGO...</div>
+    <div id="error_message">
+        <h3>Error al cargar el juego</h3>
+        <p>Este juego requiere un servidor local para funcionar completamente.</p>
+        <p>Para jugar la versión completa:</p>
+        <p>1. Descarga el código fuente</p>
+        <p>2. Ejecuta: npm install && npm start</p>
+        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #ff0080; color: white; border: none; border-radius: 5px; cursor: pointer;">REINTENTAR</button>
+    </div>
+
+    <div id="progress"></div>
+
+    <!-- Three.js desde CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <script type="module">
+        console.log('Zona de Combate - Iniciando...');
+        
+        // Verificar si Three.js se cargó correctamente
+        if (typeof THREE === 'undefined') {
+            console.error('Three.js no se pudo cargar desde CDN');
+            showError();
+            return;
+        }
+
+        console.log('Three.js cargado correctamente');
+
+        // Variables globales del juego
+        let scene, camera, renderer;
+        let gameStarted = false;
+        let currentGameMode = 'classic';
+
+        // Inicializar el juego básico
+        function initGame() {
+            try {
+                console.log('Inicializando juego básico...');
+                
+                // Crear escena
+                scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x87CEEB);
+
+                // Crear cámara
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                camera.position.set(0, 1.6, 5);
+
+                // Crear renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                document.body.appendChild(renderer.domElement);
+
+                // Crear iluminación básica
+                const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+                scene.add(ambientLight);
+
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                directionalLight.position.set(10, 10, 5);
+                directionalLight.castShadow = true;
+                scene.add(directionalLight);
+
+                // Crear suelo básico
+                const floorGeometry = new THREE.PlaneGeometry(100, 100);
+                const floorMaterial = new THREE.MeshLambertMaterial({ color: 0x808080 });
+                const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+                floor.rotation.x = -Math.PI / 2;
+                floor.receiveShadow = true;
+                scene.add(floor);
+
+                // Crear algunos cubos como obstáculos
+                for (let i = 0; i < 10; i++) {
+                    const cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
+                    const cubeMaterial = new THREE.MeshLambertMaterial({ 
+                        color: Math.random() * 0xffffff 
+                    });
+                    const cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+                    cube.position.set(
+                        (Math.random() - 0.5) * 50,
+                        1,
+                        (Math.random() - 0.5) * 50
+                    );
+                    cube.castShadow = true;
+                    scene.add(cube);
+                }
+
+                console.log('Juego básico inicializado correctamente');
+                return true;
+            } catch (error) {
+                console.error('Error al inicializar el juego:', error);
+                return false;
             }
-            
-            console.log('Game started successfully!');
         }
-        
-        function backToMenu() {
-            console.log('Returning to menu');
+
+        // Función de animación
+        function animate() {
+            requestAnimationFrame(animate);
             
-            const menu = document.getElementById('menu');
-            const game = document.getElementById('game');
-            
-            // Mostrar menú
-            menu.style.display = 'block';
-            
-            // Ocultar juego
-            game.style.display = 'none';
-            
-            console.log('Back to menu');
+            if (gameStarted && renderer && scene && camera) {
+                // Rotar la cámara lentamente
+                camera.position.x = Math.sin(Date.now() * 0.001) * 10;
+                camera.position.z = Math.cos(Date.now() * 0.001) * 10;
+                camera.lookAt(0, 0, 0);
+                
+                renderer.render(scene, camera);
+            }
         }
-        
-        // Log cuando la página carga
-        window.addEventListener('DOMContentLoaded', () => {
-            console.log('Zona de Combate - Menu loaded successfully!');
-            console.log('Click any game mode button to test functionality');
+
+        // Mostrar mensaje de carga
+        function showLoading() {
+            document.getElementById('loading_message').style.display = 'block';
+            document.getElementById('menu').style.visibility = 'hidden';
+        }
+
+        // Ocultar mensaje de carga
+        function hideLoading() {
+            document.getElementById('loading_message').style.display = 'none';
+        }
+
+        // Mostrar error
+        function showError() {
+            document.getElementById('error_message').style.display = 'block';
+            document.getElementById('menu').style.visibility = 'hidden';
+            hideLoading();
+        }
+
+        // Iniciar juego
+        function startGame(mode) {
+            console.log('Iniciando modo:', mode);
+            currentGameMode = mode;
+            
+            showLoading();
+            
+            // Simular carga
+            setTimeout(() => {
+                if (initGame()) {
+                    // Ocultar menú y mostrar HUD
+                    document.getElementById('menu').style.visibility = 'hidden';
+                    document.getElementById('game_hud').style.visibility = 'visible';
+                    hideLoading();
+                    gameStarted = true;
+                    
+                    console.log('Juego iniciado exitosamente en modo:', mode);
+                    
+                    // Mostrar mensaje de éxito
+                    setTimeout(() => {
+                        alert(`¡Juego iniciado en ${mode.toUpperCase()}!\n\nEsta es una versión básica que funciona en GitHub Pages.\nPara la versión completa con física y NPCs, ejecuta localmente con npm start.`);
+                    }, 1000);
+                } else {
+                    showError();
+                }
+            }, 2000);
+        }
+
+        // Configurar botones del menú
+        function setupMenuButtons() {
+            console.log('Configurando botones del menú...');
+            
+            document.getElementById('survival_mode').addEventListener('click', () => {
+                startGame('survival');
+            });
+            
+            document.getElementById('wave_mode').addEventListener('click', () => {
+                startGame('waves');
+            });
+            
+            document.getElementById('classic_mode').addEventListener('click', () => {
+                startGame('classic');
+            });
+            
+            console.log('Botones configurados correctamente');
+        }
+
+        // Manejar redimensionamiento de ventana
+        function onWindowResize() {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM cargado, configurando juego...');
+            setupMenuButtons();
+            animate();
+            window.addEventListener('resize', onWindowResize);
+            console.log('Zona de Combate listo para jugar!');
         });
+
     </script>
 </body>
 </html>
