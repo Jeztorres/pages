@@ -88,7 +88,6 @@ class FPSGameApp{
   Init(){
     this.LoadAssets();
     this.SetupGraphics();
-    this.SetupStartButton();
   }
 
   SetupGraphics(){
@@ -171,20 +170,37 @@ class FPSGameApp{
   }
 
   SetupStartButton(){
-    document.getElementById('survival_mode').addEventListener('click', () => {
-      this.currentGameMode = GameModes.SURVIVAL;
-      this.StartGame();
-    });
+    console.log('Setting up start buttons...');
     
-    document.getElementById('wave_mode').addEventListener('click', () => {
-      this.currentGameMode = GameModes.WAVES;
-      this.StartGame();
-    });
+    const survivalBtn = document.getElementById('survival_mode');
+    const waveBtn = document.getElementById('wave_mode');
+    const classicBtn = document.getElementById('classic_mode');
     
-    document.getElementById('classic_mode').addEventListener('click', () => {
-      this.currentGameMode = GameModes.CLASSIC;
-      this.StartGame();
-    });
+    console.log('Buttons found:', { survivalBtn, waveBtn, classicBtn });
+    
+    if (survivalBtn) {
+      survivalBtn.addEventListener('click', () => {
+        console.log('Survival mode clicked');
+        this.currentGameMode = GameModes.SURVIVAL;
+        this.StartGame();
+      });
+    }
+    
+    if (waveBtn) {
+      waveBtn.addEventListener('click', () => {
+        console.log('Wave mode clicked');
+        this.currentGameMode = GameModes.WAVES;
+        this.StartGame();
+      });
+    }
+    
+    if (classicBtn) {
+      classicBtn.addEventListener('click', () => {
+        console.log('Classic mode clicked');
+        this.currentGameMode = GameModes.CLASSIC;
+        this.StartGame();
+      });
+    }
   }
 
   ShowMenu(visible=true){
@@ -271,6 +287,7 @@ class FPSGameApp{
 
     this.HideProgress();
     this.ShowMenu();
+    this.SetupStartButton(); // Configurar botones después de mostrar el menú
   }
 
   EntitySetup(){
