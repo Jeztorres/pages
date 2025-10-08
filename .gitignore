@@ -3,7 +3,6 @@
 .editorconfig
 README.md
 yarn.lock
-webpack.config.js
 LICENSE
 
 # Dependencias

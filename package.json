@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "start": "webpack serve",
-    "prebuild": "npx rimraf ./build && npx mkdirp ./build",
+    "prebuild": "npx rimraf ./dist && npx mkdirp ./dist",
     "build": "webpack --mode production"
   },
   "dependencies": {
